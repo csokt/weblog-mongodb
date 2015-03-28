@@ -2,7 +2,7 @@
 /* global module */
 /* global process */
 
-var weblogMongodb = function(setup, headers, dbconnection) {
+var weblogMongodb = function(setup) {
   setup.host  = setup.host ? setup.host : require('ip').address()
   setup.topic = setup.domain+'.'+setup.host+'.'+setup.service
 
@@ -19,11 +19,11 @@ var weblogMongodb = function(setup, headers, dbconnection) {
   var db
   var main = function(session) {
 
-    MongoClient.connect(dbconnection, function(err, database) {
+    MongoClient.connect(setup.dbconnection, function(err, database) {
       if(err) throw err
       db = database
 
-      var stream = db.collection(headers[0].collection).find({}, {
+      var stream = db.collection(setup.headers[0].collection).find({}, {
           tailable : true,
           awaitdata : true,
           numberOfRetries : -1,
@@ -32,7 +32,7 @@ var weblogMongodb = function(setup, headers, dbconnection) {
       var publish2topic = false, val
       stream.on('data', function(data) {
         if (publish2topic && data) {
-          val = _.values(_.pick(data, headers[0].fields))
+          val = _.values(_.pick(data, setup.headers[0].fields))
           session.publish(setup.topic, val)
         }
       })
@@ -41,11 +41,11 @@ var weblogMongodb = function(setup, headers, dbconnection) {
     })
 
     session.subscribe('discover', function() {
-      session.publish('announce', [setup]);
+      session.publish('announce', [_.pick(setup, 'domain', 'host', 'service', 'topic')])
     })
 
     session.register(setup.topic+'.header', function() {
-      return headers
+      return setup.headers
     })
 
     session.register(setup.topic+'.reload', function(args) {
