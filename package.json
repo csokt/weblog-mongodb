@@ -1,6 +1,6 @@
 {
   "name": "weblog-mongodb",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "weblog mongodb module",
   "main": "index.js",
   "scripts": {
@@ -23,8 +23,8 @@
   "dependencies": {
     "autobahn": "^0.9.6",
     "ip": "^0.3.2",
-    "lodash": "^3.6.0",
-    "mongodb": "^2.0.27",
+    "lodash": "^3.7.0",
+    "mongodb": "^2.0.28",
     "when": "^3.7.2"
   }
 }
